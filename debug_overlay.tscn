@@ -1,0 +1,37 @@
+[gd_scene load_steps=3 format=3 uid="uid://jnhkoxtiaqb0"]
+
+[ext_resource type="Script" uid="uid://ckkgke8c10nlv" path="res://addons/debug_overlay/debug_overlay.gd" id="1_jlkoe"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bssq0"]
+bg_color = Color(0, 0, 0, 0.415686)
+
+[node name="Debug" type="Control"]
+custom_minimum_size = Vector2(71.69, 32.85)
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_jlkoe")
+
+[node name="PanelContainer" type="PanelContainer" parent="."]
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_top = -20.0
+offset_right = 20.0
+grow_vertical = 0
+theme_override_styles/panel = SubResource("StyleBoxFlat_bssq0")
+
+[node name="MarginContainer" type="MarginContainer" parent="PanelContainer"]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="VBoxContainer" type="VBoxContainer" parent="PanelContainer/MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 4
