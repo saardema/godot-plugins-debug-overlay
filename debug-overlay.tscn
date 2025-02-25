@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=3 uid="uid://jnhkoxtiaqb0"]
 
-[ext_resource type="Script" uid="uid://ckkgke8c10nlv" path="res://addons/debug_overlay/debug_overlay.gd" id="1_jlkoe"]
+[ext_resource type="Script" uid="uid://ckkgke8c10nlv" path="res://addons/debug-overlay/debug-overlay.gd" id="1_7uw4y"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bssq0"]
 bg_color = Color(0, 0, 0, 0.415686)
@@ -13,7 +13,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-script = ExtResource("1_jlkoe")
+script = ExtResource("1_7uw4y")
 
 [node name="PanelContainer" type="PanelContainer" parent="."]
 layout_mode = 1
