@@ -6,15 +6,11 @@ extends Control
 var _label_settings: LabelSettings
 var _labels = {}
 var lines: Dictionary[String, Line3D]
-var _line_material: ORMMaterial3D
 
 func _ready() -> void:
 	visible = false
 	_label_settings = LabelSettings.new()
 	_label_settings.font_size = 16
-	_line_material = ORMMaterial3D.new()
-	_line_material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-	_line_material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 
 func write(id: String, value: String):
 	if not _labels.has(id):
@@ -68,13 +64,13 @@ func draw_line_3d(id: String, from: Vector3, to: Vector3, color: Color = Color.R
 		node = lines[id].node
 		lines[id].time_updated = Time.get_ticks_msec()
 
-	var mesh_instance = node.get_child(0)
+	var mesh_instance: MeshInstance3D = node.get_child(0)
 	var length = from.distance_to(to)
 
 	if is_equal_approx(from.x, to.x):
-		from.x += 0.00001
+		from.x += 0.005
 	elif is_equal_approx(from.z, to.z):
-		from.z += 0.00001
+		from.z += 0.005
 
 	node.look_at_from_position(from, to)
 
@@ -92,8 +88,12 @@ func _create_line_node() -> Node3D:
 	mesh_instance.mesh.top_radius = 0.01
 	mesh_instance.mesh.bottom_radius = 0.01
 	mesh_instance.mesh.radial_segments = 0
-	mesh_instance.rotation.x = -PI/2
-	mesh_instance.mesh.material = _line_material
+	mesh_instance.rotation.x = -PI / 2
+
+	var material := ORMMaterial3D.new()
+	material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	mesh_instance.mesh.material = material
 
 	add_child(node)
 
