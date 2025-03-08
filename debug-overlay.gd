@@ -7,12 +7,18 @@ var _label_settings: LabelSettings
 var _labels = {}
 var lines: Dictionary[String, Line3D]
 
+#func _draw() -> void:
+	#draw_circle(Vector2(42.479, 65.4825), 9.3905, Color.WHITE)
+	#draw_arc(Vector2(500, 500), 100, 1, PI, 20, Color.RED, 50)
+
 func _ready() -> void:
 	visible = false
 	_label_settings = LabelSettings.new()
 	_label_settings.font_size = 16
 
-func write(id: String, value: String):
+func write(id: String, value, precision: int = 2):
+	if value is float:
+		value = ('%.' + str(precision) + 'f') % value
 	if not _labels.has(id):
 		visible = true
 		_labels[id] = _add_label()

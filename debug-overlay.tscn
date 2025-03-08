@@ -6,6 +6,7 @@
 bg_color = Color(0, 0, 0, 0.415686)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_7uw4y"]
+no_depth_test = true
 vertex_color_use_as_albedo = true
 
 [sub_resource type="ImmediateMesh" id="ImmediateMesh_7uw4y"]
@@ -43,4 +44,5 @@ theme_override_constants/separation = 4
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="."]
 material_override = SubResource("StandardMaterial3D_7uw4y")
+cast_shadow = 0
 mesh = SubResource("ImmediateMesh_7uw4y")
