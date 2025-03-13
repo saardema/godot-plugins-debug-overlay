@@ -8,8 +8,10 @@ var _labels = {}
 var lines: Dictionary[String, Line3D]
 
 #func _draw() -> void:
+	#draw_line(Vector2(30, 30), Vector2(80, 80), Color.RED)
 	#draw_circle(Vector2(42.479, 65.4825), 9.3905, Color.WHITE)
 	#draw_arc(Vector2(500, 500), 100, 1, PI, 20, Color.RED, 50)
+
 
 func _ready() -> void:
 	visible = false
