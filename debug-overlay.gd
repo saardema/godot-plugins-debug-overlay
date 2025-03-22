@@ -4,35 +4,35 @@ extends Control
 @onready var _container = $PanelContainer/MarginContainer/VBoxContainer
 
 var _label_settings: LabelSettings
-var _labels = {}
-var lines: Dictionary[String, Line3D]
-
-#func _draw() -> void:
-	#draw_line(Vector2(30, 30), Vector2(80, 80), Color.RED)
-	#draw_circle(Vector2(42.479, 65.4825), 9.3905, Color.WHITE)
-	#draw_arc(Vector2(500, 500), 100, 1, PI, 20, Color.RED, 50)
-
+var lines: Dictionary[StringName, ExpiringNode]
+var text_nodes: Dictionary[StringName, ExpiringNode]
 
 func _ready() -> void:
 	visible = false
 	_label_settings = LabelSettings.new()
-	_label_settings.font_size = 16
+	_label_settings.font_size = 14
+	_label_settings.font = SystemFont.new()
+	var font_list := PackedStringArray()
+	font_list.append('Monaco')
+	_label_settings.font.font_names = font_list
 
-func write(id: String, value, precision: int = 2):
+func write(id: StringName, value, precision: int = 2):
 	if value is float:
 		value = ('%.' + str(precision) + 'f') % value
-	if not _labels.has(id):
+
+	if not text_nodes.has(id):
 		visible = true
-		_labels[id] = _add_label()
+		text_nodes[id] = _create_label()
+		_container.add_child(text_nodes[id].node)
 
-	_labels[id].text = "%s: %s" % [id, value]
+	text_nodes[id].node.text = &"%s: %s" % [id, value]
 
-func _add_label() -> Label:
+func _create_label() -> ExpiringNode:
 	var label = Label.new()
 	label.label_settings = _label_settings
-	_container.add_child(label)
+	var node = ExpiringNode.new(label, Time.get_ticks_msec())
 
-	return label
+	return node
 
 func _physics_process(_delta: float) -> void:
 	_immediate_draw_target.mesh.clear_surfaces()
@@ -41,12 +41,12 @@ func _physics_process(_delta: float) -> void:
 	var remove_queue = []
 
 	for id in lines:
-		if time > lines[id].time_updated + 1000:
+		if time > lines[id].time_updated + ExpiringNode.lifetime_ms:
 			lines[id].node.queue_free()
 			remove_queue.append(id)
 		else:
 			var mesh_instance = lines[id].node.get_child(0)
-			mesh_instance.transparency = (time - lines[id].time_updated) / 1000.0
+			mesh_instance.transparency = (time - lines[id].time_updated) / ExpiringNode.lifetime_ms
 
 	for id in remove_queue:
 		lines.erase(id)
@@ -67,7 +67,8 @@ func draw_line_3d(id: String, from: Vector3, to: Vector3, color: Color = Color.R
 	var node: Node3D
 	if not lines.has(id):
 		node = _create_line_node()
-		lines[id] = Line3D.new(node, Time.get_ticks_msec())
+		add_child(node)
+		lines[id] = ExpiringNode.new(node, Time.get_ticks_msec())
 	else:
 		node = lines[id].node
 		lines[id].time_updated = Time.get_ticks_msec()
@@ -103,14 +104,13 @@ func _create_line_node() -> Node3D:
 	material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 	mesh_instance.mesh.material = material
 
-	add_child(node)
-
 	return node
 
-class Line3D:
-	var node: Node3D
+class ExpiringNode:
+	var node: Node
 	var time_updated: int
+	static var lifetime_ms: float = 1000
 
-	func _init(_node: Node3D, _time_updated: int):
+	func _init(_node: Node, _time_updated: int):
 		node = _node
 		time_updated = _time_updated
