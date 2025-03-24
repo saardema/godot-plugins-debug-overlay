@@ -1,11 +1,13 @@
 extends Control
 
 @onready var _immediate_draw_target:= $MeshInstance3D
-@onready var _container = $PanelContainer/MarginContainer/VBoxContainer
+@onready var _label_container = $PanelContainer/MarginContainer/VBoxContainer
+@onready var _line_3d_container: Node3D = $Line3DContainer
 
 var _label_settings: LabelSettings
-var lines: Dictionary[StringName, ExpiringNode]
+var line_nodes: Dictionary[StringName, ExpiringNode]
 var text_nodes: Dictionary[StringName, ExpiringNode]
+var _time_last_cleanup: int
 
 func _ready() -> void:
 	visible = false
@@ -23,14 +25,16 @@ func write(id: StringName, value, precision: int = 2):
 	if not text_nodes.has(id):
 		visible = true
 		text_nodes[id] = _create_label()
-		_container.add_child(text_nodes[id].node)
+		_label_container.add_child(text_nodes[id].node)
+	else:
+		text_nodes[id].keep_alive()
 
 	text_nodes[id].node.text = &"%s: %s" % [id, value]
 
 func _create_label() -> ExpiringNode:
 	var label = Label.new()
 	label.label_settings = _label_settings
-	var node = ExpiringNode.new(label, Time.get_ticks_msec())
+	var node = ExpiringNode.new(label)
 
 	return node
 
@@ -38,18 +42,25 @@ func _physics_process(_delta: float) -> void:
 	_immediate_draw_target.mesh.clear_surfaces()
 
 	var time := Time.get_ticks_msec()
-	var remove_queue = []
+	if time < _time_last_cleanup + 100: return
 
-	for id in lines:
-		if time > lines[id].time_updated + ExpiringNode.lifetime_ms:
-			lines[id].node.queue_free()
-			remove_queue.append(id)
-		else:
-			var mesh_instance = lines[id].node.get_child(0)
-			mesh_instance.transparency = (time - lines[id].time_updated) / ExpiringNode.lifetime_ms
+	_time_last_cleanup = time
 
-	for id in remove_queue:
-		lines.erase(id)
+	for id in text_nodes.keys():
+		if time > text_nodes[id].time_updated + ExpiringNode.lifetime_ms:
+			text_nodes[id].node.queue_free()
+			text_nodes.erase(id)
+
+	visible = text_nodes.size() > 0
+
+	for id in line_nodes:
+		if time > line_nodes[id].time_updated + ExpiringNode.lifetime_ms:
+			line_nodes[id].node.queue_free()
+			line_nodes.erase(id)
+		#else:
+			#var mesh_instance = line_nodes[id].node.get_child(0)
+			#mesh_instance.transparency = (time - line_nodes[id].time_updated) / ExpiringNode.lifetime_ms
+
 
 func draw_line_3d_immediate(point_a: Vector3, point_b: Vector3, color: Color = Color.RED):
 	if point_a.is_equal_approx(point_b): return
@@ -62,16 +73,15 @@ func draw_line_3d_immediate(point_a: Vector3, point_b: Vector3, color: Color = C
 
 	_immediate_draw_target.mesh.surface_end()
 
-
 func draw_line_3d(id: String, from: Vector3, to: Vector3, color: Color = Color.RED):
 	var node: Node3D
-	if not lines.has(id):
+	if not line_nodes.has(id):
 		node = _create_line_node()
-		add_child(node)
-		lines[id] = ExpiringNode.new(node, Time.get_ticks_msec())
+		_line_3d_container.add_child(node)
+		line_nodes[id] = ExpiringNode.new(node)
 	else:
-		node = lines[id].node
-		lines[id].time_updated = Time.get_ticks_msec()
+		node = line_nodes[id].node
+		line_nodes[id].keep_alive()
 
 	var mesh_instance: MeshInstance3D = node.get_child(0)
 	var length = from.distance_to(to)
@@ -111,6 +121,9 @@ class ExpiringNode:
 	var time_updated: int
 	static var lifetime_ms: float = 1000
 
-	func _init(_node: Node, _time_updated: int):
+	func _init(_node: Node):
 		node = _node
-		time_updated = _time_updated
+		keep_alive()
+
+	func keep_alive():
+		time_updated = Time.get_ticks_msec()
