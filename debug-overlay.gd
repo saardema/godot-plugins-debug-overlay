@@ -18,23 +18,22 @@ func _ready() -> void:
 	font_list.append('Monaco')
 	_label_settings.font.font_names = font_list
 
-func write(id: StringName, value, precision: int = 2):
+func write(id: StringName, value, precision: int = 2, expires: bool = true):
 	if value is float:
 		value = ('%.' + str(precision) + 'f') % value
 
 	if not text_nodes.has(id):
-		visible = true
-		text_nodes[id] = _create_label()
+		text_nodes[id] = _create_label(expires)
 		_label_container.add_child(text_nodes[id].node)
 	else:
 		text_nodes[id].keep_alive()
 
 	text_nodes[id].node.text = &"%s: %s" % [id, value]
 
-func _create_label() -> ExpiringNode:
+func _create_label(expires: bool) -> ExpiringNode:
 	var label = Label.new()
 	label.label_settings = _label_settings
-	var node = ExpiringNode.new(label)
+	var node = ExpiringNode.new(label, expires)
 
 	return node
 
@@ -47,11 +46,12 @@ func _physics_process(_delta: float) -> void:
 	_time_last_cleanup = time
 
 	for id in text_nodes.keys():
+		if not text_nodes[id].expires: continue
 		if time > text_nodes[id].time_updated + ExpiringNode.lifetime_ms:
 			text_nodes[id].node.queue_free()
 			text_nodes.erase(id)
 
-	visible = text_nodes.size() > 0
+	#visible = text_nodes.size() > 0
 
 	for id in line_nodes:
 		if time > line_nodes[id].time_updated + ExpiringNode.lifetime_ms:
@@ -119,10 +119,12 @@ func _create_line_node() -> Node3D:
 class ExpiringNode:
 	var node: Node
 	var time_updated: int
+	var expires: bool
 	static var lifetime_ms: float = 1000
 
-	func _init(_node: Node):
+	func _init(_node: Node, _expires: bool = true):
 		node = _node
+		expires = _expires
 		keep_alive()
 
 	func keep_alive():
