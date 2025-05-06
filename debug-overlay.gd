@@ -3,6 +3,7 @@ extends Control
 @onready var _immediate_draw_target:= $MeshInstance3D
 @onready var _label_container = $PanelContainer/MarginContainer/VBoxContainer
 @onready var _line_3d_container: Node3D = $Line3DContainer
+@onready var panel_container: PanelContainer = $PanelContainer
 
 var _label_settings: LabelSettings
 var line_nodes: Dictionary[StringName, ExpiringNode]
@@ -10,7 +11,7 @@ var text_nodes: Dictionary[StringName, ExpiringNode]
 var _time_last_cleanup: int
 
 func _ready() -> void:
-	visible = false
+	panel_container.visible = false
 	_label_settings = LabelSettings.new()
 	_label_settings.font_size = 14
 	_label_settings.font = SystemFont.new()
@@ -19,6 +20,7 @@ func _ready() -> void:
 	_label_settings.font.font_names = font_list
 
 func write(id: StringName, value, precision: int = 2, expires: bool = true):
+	#print(id, value)
 	if value is float:
 		value = ('%.' + str(precision) + 'f') % value
 
@@ -51,7 +53,7 @@ func _physics_process(_delta: float) -> void:
 			text_nodes[id].node.queue_free()
 			text_nodes.erase(id)
 
-	#visible = text_nodes.size() > 0
+	panel_container.visible = text_nodes.size() > 0
 
 	for id in line_nodes:
 		if time > line_nodes[id].time_updated + ExpiringNode.lifetime_ms:
