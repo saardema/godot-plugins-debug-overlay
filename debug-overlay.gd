@@ -1,6 +1,6 @@
 extends Control
 
-@onready var _immediate_draw_target:= $MeshInstance3D
+@onready var _immediate_draw_target := $MeshInstance3D
 @onready var _label_container = $PanelContainer/MarginContainer/VBoxContainer
 @onready var _line_3d_container: Node3D = $Line3DContainer
 @onready var panel_container: PanelContainer = $PanelContainer
@@ -95,7 +95,7 @@ func draw_line_3d(id: String, from: Vector3, to: Vector3, color: Color = Color.R
 
 	node.look_at_from_position(from, to)
 
-	mesh_instance.position.z = -length / 2
+	mesh_instance.position.z = - length / 2
 	mesh_instance.mesh.height = length
 	mesh_instance.mesh.material.albedo_color = color
 
@@ -109,12 +109,12 @@ func _create_line_node() -> Node3D:
 	mesh_instance.mesh.top_radius = 0.01
 	mesh_instance.mesh.bottom_radius = 0.01
 	mesh_instance.mesh.radial_segments = 0
-	mesh_instance.rotation.x = -PI / 2
+	mesh_instance.rotation.x = - PI / 2
 
-	var material := ORMMaterial3D.new()
-	material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-	material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-	mesh_instance.mesh.material = material
+	var mat := ORMMaterial3D.new()
+	mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	mesh_instance.mesh.material = mat
 
 	return node
 
