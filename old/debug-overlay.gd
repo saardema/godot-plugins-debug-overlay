@@ -1,3 +1,4 @@
+@tool
 extends Control
 
 @onready var _immediate_draw_target := $MeshInstance3D
@@ -20,7 +21,6 @@ func _ready() -> void:
 	_label_settings.font.font_names = font_list
 
 func write(id: StringName, value, precision: int = 2, expires: bool = true):
-	#print(id, value)
 	if value is float:
 		value = ('%.' + str(precision) + 'f') % value
 
@@ -117,17 +117,3 @@ func _create_line_node() -> Node3D:
 	mesh_instance.mesh.material = mat
 
 	return node
-
-class ExpiringNode:
-	var node: Node
-	var time_updated: int
-	var expires: bool
-	static var lifetime_ms: float = 1000
-
-	func _init(_node: Node, _expires: bool = true):
-		node = _node
-		expires = _expires
-		keep_alive()
-
-	func keep_alive():
-		time_updated = Time.get_ticks_msec()

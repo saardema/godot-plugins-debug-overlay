@@ -1,0 +1,13 @@
+[gd_scene load_steps=3 format=3 uid="uid://cjt1lujkvox5j"]
+
+[sub_resource type="SystemFont" id="SystemFont_jq7o8"]
+font_names = PackedStringArray("Arial")
+subpixel_positioning = 0
+
+[sub_resource type="LabelSettings" id="LabelSettings_ux1pj"]
+font = SubResource("SystemFont_jq7o8")
+font_size = 31
+
+[node name="Label" type="Label"]
+text = "Test content"
+label_settings = SubResource("LabelSettings_ux1pj")

@@ -1,0 +1,41 @@
+[gd_scene load_steps=3 format=3 uid="uid://bmmi2v5o0s0ib"]
+
+[ext_resource type="Script" uid="uid://bh3k4xrfethde" path="res://addons/debug-tools/ui/ui.gd" id="1_jq7o8"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bssq0"]
+bg_color = Color(0, 0, 0, 0.415686)
+
+[node name="UI" type="Control"]
+layout_mode = 3
+anchor_left = 0.004
+anchor_right = 1.0
+anchor_bottom = 0.994
+offset_left = -11.52
+offset_bottom = 9.71997
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("1_jq7o8")
+
+[node name="PanelContainer" type="PanelContainer" parent="."]
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_top = -20.0
+offset_right = 20.0
+grow_vertical = 0
+theme_override_styles/panel = SubResource("StyleBoxFlat_bssq0")
+
+[node name="MarginContainer" type="MarginContainer" parent="PanelContainer"]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 8
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="LabelContainer" type="VBoxContainer" parent="PanelContainer/MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 4

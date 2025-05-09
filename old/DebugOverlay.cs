@@ -1,11 +1,10 @@
-
+#if TOOLS
 using System;
 using System.Collections.Generic;
 using Godot;
 using Godot.NativeInterop;
 
-// [Tool]
-[GlobalClass]
+[Tool]
 public partial class DebugOverlay : Control
 {
 	MeshInstance3D _immediateDrawTarget;
@@ -15,6 +14,8 @@ public partial class DebugOverlay : Control
 
 	public LabelSettings _labelSettings;
 
+	private bool _immediateMeshIsDirty = false;
+
 	readonly Dictionary<string, ExpiringEntity> lineNodes = [];
 
 	readonly Dictionary<string, ExpiringEntity> textNodes = [];
@@ -23,53 +24,74 @@ public partial class DebugOverlay : Control
 
 	public static DebugOverlay Instance { get; private set; }
 
+	public DebugOverlay() => GD.Print("DebugOverlay constructor");
+
+	~DebugOverlay() => GD.Print("DebugOverlay deconstructor");
+
+	public override void _EnterTree() => GD.Print("DebugOverlay EnterTree");
+
 	public override void _Ready()
 	{
-		GD.Print("Ready");
-	}
+		GD.Print("DebugOverlay Ready");
 
-	public override void _EnterTree()
-	{
-		GD.Print("Enter tree");
+		Name = "DebugOverlay";
 
 		Instance = this;
+
 		_immediateDrawTarget = (MeshInstance3D)GetNode("MeshInstance3D");
 		_labelContainer = (VBoxContainer)GetNode("PanelContainer/MarginContainer/VBoxContainer");
 		_line3DContainer = (Node3D)GetNode("Line3DContainer");
 		panelContainer = (PanelContainer)GetNode("PanelContainer");
 
 		panelContainer.Visible = false;
+
 		_labelSettings = new()
 		{
-			FontSize = 14,
+			FontSize = 36,
 			Font = new SystemFont()
 		};
 	}
 
+	public void OnSceneChange(Node SceneRoot)
+	{
+
+	}
+
 	public override void _ExitTree()
 	{
-		GD.Print("Exit tree");
+		GD.Print("DebugOverlay Exit tree");
+		lineNodes.Clear();
+		textNodes.Clear();
 	}
 
-	public void Write(StringName id, float value, int precision = 2, bool expires = true)
-	{
-		var stringValue = value.ToString("N" + precision);
-		Write(id, stringValue, expires);
-	}
+	public void Write(string id, float value) =>
+		Write(id, value, 2, true);
 
-	public void Write(StringName id, string value, bool expires = true)
+	public void Write(string id, float value, int precision) =>
+		Write(id, value, precision, true);
+
+	public void Write(string id, float value, int precision, bool expires) =>
+		Write(id, value.ToString("N" + precision), expires);
+
+	public void Write(string id, string value) =>
+		Write(id, value, true);
+
+	public void Write(string id, string value, bool expires)
 	{
-		if (!textNodes.ContainsKey(id))
+		ExpiringEntity textNode;
+
+		if (textNodes.TryGetValue(id, out textNode))
 		{
-			textNodes[id] = CreateLabel(expires);
-			_labelContainer.AddChild(textNodes[id].Node);
+			textNode.KeepAlive();
 		}
 		else
 		{
-			textNodes[id].KeepAlive();
+			textNode = CreateLabel(expires);
+			textNodes[id] = textNode;
+			_labelContainer.AddChild(textNode.Node);
 		}
 
-		var label = (Label)textNodes[id].Node;
+		var label = (Label)textNode.Node;
 		label.Text = $"{id}: {value}";
 	}
 
@@ -83,9 +105,12 @@ public partial class DebugOverlay : Control
 
 	public override void _PhysicsProcess(double _delta)
 	{
-		return;
-		var mesh = (ImmediateMesh)_immediateDrawTarget.Mesh;
-		mesh.ClearSurfaces();
+		if (_immediateMeshIsDirty)
+		{
+			_immediateMeshIsDirty = false;
+			var mesh = (ImmediateMesh)_immediateDrawTarget.Mesh;
+			mesh.ClearSurfaces();
+		}
 
 		var time = Time.GetTicksMsec();
 		if (time < _timeLastCleanup + 100) return;
@@ -115,8 +140,6 @@ public partial class DebugOverlay : Control
 				//else:
 				//var meshInstance = lineNodes[id].node.GetChild(0);
 				//mesh_instance.transparency = (time - lineNodes[id].timeUpdated) / ExpiringNode.lifetimeMs;
-
-
 			}
 		}
 	}
@@ -138,12 +161,14 @@ public partial class DebugOverlay : Control
 
 		mesh.SurfaceEnd();
 
+		_immediateMeshIsDirty = true;
 	}
 
-	public void DrawLine3d(string id, Vector3 from, Vector3 to, Color? color = null)
+	public void DrawLine3D(string id, Vector3 from, Vector3 to) => DrawLine3D(id, from, to, Colors.Red);
+
+	public void DrawLine3D(string id, Vector3 from, Vector3 to, Color color)
 	{
 		Node3D node;
-		color ??= Colors.Red;
 
 		if (lineNodes.TryGetValue(id, out ExpiringEntity expiringEntity))
 		{
@@ -194,12 +219,14 @@ public partial class DebugOverlay : Control
 		return node;
 	}
 
-	public partial class ExpiringEntity : RefCounted
+	public partial class ExpiringEntity
 	{
 		public Node Node;
 		public ulong timeUpdated;
 		public bool expires;
 		public static float lifetimeMs = 1000;
+
+		public ExpiringEntity() { }
 
 		public ExpiringEntity(Node _node, bool _expires = true)
 		{
@@ -210,6 +237,5 @@ public partial class DebugOverlay : Control
 
 		public void KeepAlive() => timeUpdated = Time.GetTicksMsec();
 	}
-
-
 }
+#endif

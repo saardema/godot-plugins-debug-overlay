@@ -1,0 +1,31 @@
+[gd_scene load_steps=5 format=3 uid="uid://ckebu4fcrr5m7"]
+
+[ext_resource type="Script" uid="uid://cwj4djyp6e26i" path="res://addons/debug-tools/draw3d/draw3d.gd" id="1_gftdf"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_icm08"]
+cull_mode = 2
+shading_mode = 0
+disable_fog = true
+vertex_color_use_as_albedo = true
+grow_amount = 1.829
+
+[sub_resource type="QuadMesh" id="QuadMesh_5yqve"]
+center_offset = Vector3(0, 0, 0.5)
+orientation = 1
+
+[sub_resource type="MultiMesh" id="MultiMesh_0rdtu"]
+transform_format = 1
+use_colors = true
+mesh = SubResource("QuadMesh_5yqve")
+
+[node name="Draw3D" type="Node3D"]
+script = ExtResource("1_gftdf")
+material = SubResource("StandardMaterial3D_icm08")
+
+[node name="LineMesh" type="MeshInstance3D" parent="."]
+material_override = SubResource("StandardMaterial3D_icm08")
+
+[node name="MultiMeshInstance3D" type="MultiMeshInstance3D" parent="."]
+material_override = SubResource("StandardMaterial3D_icm08")
+cast_shadow = 0
+multimesh = SubResource("MultiMesh_0rdtu")
