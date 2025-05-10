@@ -9,7 +9,6 @@ var is_enabled: bool = true
 var camera: Camera3D
 var ui_node: Node
 
-
 func _on_plugin_exit() -> void:
 	print("DebugTools exit_tree")
 	ui.clear_map()
@@ -29,10 +28,11 @@ func _ready():
 	ui = $UI
 	ui.set_current_scene(get_tree().current_scene, ui_node)
 	draw3d.set_current_scene(get_tree().current_scene)
+	find_child("CSBridge").call("SetInstance", self )
 
 func _process(delta: float) -> void:
-	draw3d.clean()
 	draw3d.draw_lines(camera.position)
+	draw3d.clean()
 	ui.clean()
 
 func write(id: StringName, text: Variant, expires: bool = true):

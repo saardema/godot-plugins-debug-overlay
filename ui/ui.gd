@@ -11,6 +11,7 @@ func write(id: String, value: Variant, expires: bool):
 	current_label_list.write(id, text, expires)
 
 func set_current_scene(scene: Node, ui_node: Node):
+	prints("scene: ", scene)
 	if not scene or scene.scene_file_path.contains('addons/debug-tools'):
 		current_label_list = null
 	else:
@@ -22,7 +23,7 @@ func set_current_scene(scene: Node, ui_node: Node):
 		current_label_list = scene_list_map[key]
 
 	for list in scene_list_map.values():
-		list.visible = list == current_label_list
+		list.visible = list == current_label_list and list.list.size() > 0
 
 func clear_map():
 	scene_list_map.clear()

@@ -1,8 +1,9 @@
-[gd_scene load_steps=4 format=3 uid="uid://c0fk8ouie6814"]
+[gd_scene load_steps=5 format=3 uid="uid://c0fk8ouie6814"]
 
 [ext_resource type="Script" uid="uid://b6mggqf6gsdj7" path="res://addons/debug-tools/debug-tools.gd" id="1_gqrq7"]
 [ext_resource type="PackedScene" uid="uid://ckebu4fcrr5m7" path="res://addons/debug-tools/draw3d/draw3d.tscn" id="2_ntg42"]
 [ext_resource type="Script" uid="uid://bh3k4xrfethde" path="res://addons/debug-tools/ui/ui.gd" id="3_gqrq7"]
+[ext_resource type="Script" uid="uid://da0aqns7hfekt" path="res://addons/debug-tools/src/DebugTools.cs" id="4_ntg42"]
 
 [node name="DebugTools" type="Node3D"]
 script = ExtResource("1_gqrq7")
@@ -11,3 +12,6 @@ script = ExtResource("1_gqrq7")
 
 [node name="UI" type="Node" parent="."]
 script = ExtResource("3_gqrq7")
+
+[node name="CSBridge" type="Node" parent="."]
+script = ExtResource("4_ntg42")

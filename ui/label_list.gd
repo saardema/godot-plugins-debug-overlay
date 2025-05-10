@@ -17,12 +17,11 @@ func _on_entity_expired(entity: ExpiringEntity.NodeType):
 func write(id: String, text: String, expires: bool):
 	var label: Label
 
-	if not label_container: return
-
 	if list.has(id):
 		var entity = list.fetch(id)
 		entity.refresh()
 		label = entity.node
+		list.update(id, label, expires)
 	else:
 		label = LABEL.instantiate()
 		list.add(id, label, expires)
