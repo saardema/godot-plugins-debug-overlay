@@ -10,15 +10,12 @@ vertex_color_use_as_albedo = true
 grow_amount = 1.829
 
 [sub_resource type="QuadMesh" id="QuadMesh_5yqve"]
-center_offset = Vector3(0, 0, 0.5)
 orientation = 1
 
 [sub_resource type="MultiMesh" id="MultiMesh_0rdtu"]
 transform_format = 1
 use_colors = true
-instance_count = 1
 mesh = SubResource("QuadMesh_5yqve")
-buffer = PackedFloat32Array(0.0198549, -0.0313862, 5, 2.5, 0.0845099, 0.053461, 0, 0, -0.0496373, 0.0784655, 2, 0, 1, 0, 0, 1)
 
 [node name="Draw3D" type="Node3D"]
 script = ExtResource("1_gftdf")

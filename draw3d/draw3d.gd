@@ -6,6 +6,9 @@ extends Node3D
 
 @export var material: StandardMaterial3D
 
+var scene_lines_map: Dictionary[StringName, ExpiringEntity.LineType.List]
+var current_lines: ExpiringEntity.LineType.List = ExpiringEntity.LineType.List.new()
+
 func _ready():
 	mi.material_override = material
 	mmi.material_override = material
@@ -15,11 +18,27 @@ func clear():
 	mi.mesh = null
 	mmi.multimesh.instance_count = 0
 
-func draw_lines(lines: ExpiringEntity.List, camera_position: Vector3):
-	_build_line_multi_mesh(lines, camera_position)
-	#if helper_list.size(): build_line_mesh(helper_list)
-	#helper_list.clean()
-#var helper_list = ExpiringEntity.LineType.List.new()
+func draw_lines(camera_position: Vector3):
+	_build_line_multi_mesh(current_lines, camera_position)
+
+func set_line(id: StringName, p1: Vector3, p2: Vector3, color: Color, thickness: float, expires: bool):
+	current_lines.upsert(id, p1, p2, color, thickness, expires)
+
+func clean():
+	current_lines.clean()
+
+func set_current_scene(scene):
+
+	if not scene or scene.scene_file_path.contains('addons/debug-tools'):
+		current_lines = ExpiringEntity.LineType.List.new()
+		return
+
+	var key: String = scene.scene_file_path
+
+	if not scene_lines_map.has(key):
+		scene_lines_map[key] = ExpiringEntity.LineType.List.new()
+
+	current_lines = scene_lines_map[key]
 
 func _build_line_multi_mesh(lines: ExpiringEntity.List, camera_pos: Vector3):
 	mmi.multimesh.instance_count = lines.size()
@@ -32,6 +51,7 @@ func _build_line_multi_mesh(lines: ExpiringEntity.List, camera_pos: Vector3):
 		var plane = Plane(direction)
 		var projection = plane.project(cam_diff)
 		var billboard_angle = Vector3.UP.signed_angle_to(projection, -plane.normal)
+		DebugTools.write("l", billboard_angle)
 		var tf = Transform3D().looking_at(-diff).translated(center)
 		tf = tf.rotated_local(Vector3.FORWARD, billboard_angle)
 		tf = tf.scaled_local(Vector3(line.thickness, line.thickness, diff.length()))
