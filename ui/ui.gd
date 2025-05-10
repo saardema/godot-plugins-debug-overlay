@@ -1,48 +1,45 @@
 @tool
-extends Control
-@onready var panel_container: PanelContainer = $PanelContainer
+class_name _DebugTools_UI
+extends Node
+const LABEL_LIST_SCENE = preload("res://addons/debug-tools/ui/label_list.tscn")
+var scene_list_map: Dictionary[String, Node]
+var current_label_list: _DebugTools_UI_LabelList
 
-@onready var labels: VBoxContainer = $PanelContainer/MarginContainer/LabelContainer
-var label_nodes: Dictionary[StringName, ExpiringEntity.NodeType]
-var _time_last_cleanup: int
-const LABEL = preload("res://addons/debug-tools/ui/label.tscn")
+func _on_label_expired(entity: ExpiringEntity.NodeType):
+	entity.node.queue_free()
 
-func write(id: String, text: String, expires: bool):
-	if not label_nodes.has(id):
-		label_nodes[id] = _create_label(expires)
-		labels.add_child(label_nodes[id].node)
+func write(id: String, value: Variant, expires: bool):
+	var text: String = str(value)
+	if not current_label_list: return
+	current_label_list.write(id, text, expires)
+
+func update_current_scene(scene: Node, ui_node: Node):
+	if not scene:
+		current_label_list = null
+		printerr("No scene node provided in UI.gd")
+		return
+
+	if scene.scene_file_path.contains('addons/debug-tools'):
+		current_label_list = null
 	else:
-		label_nodes[id].keep_alive()
+		var key: String = scene.scene_file_path
 
-	label_nodes[id].node.text = &"%s: %s" % [id, text]
+		if not scene_list_map.has(key):
+			scene_list_map[key] = LABEL_LIST_SCENE.instantiate()
+			ui_node.add_child(scene_list_map[key])
 
-func _create_label(expires: bool) -> ExpiringEntity.NodeType:
-	process_mode = Node.PROCESS_MODE_INHERIT
-	var label = LABEL.instantiate()
-	var node = ExpiringEntity.NodeType.new(label, expires)
+		current_label_list = scene_list_map[key]
 
-	return node
+	for list in scene_list_map.values():
+		list.visible = list == current_label_list
 
-func _process(delta: float):
-	var time := Time.get_ticks_msec()
-	if time < _time_last_cleanup + 100: return
+func clear_map():
+	scene_list_map.clear()
 
-	_time_last_cleanup = time
+func clear_current_list():
+	if is_instance_valid(current_label_list):
+		current_label_list.clear()
 
-	for id in label_nodes.keys():
-		if not label_nodes[id].expires: continue
-		if time > label_nodes[id].time_updated + ExpiringEntity.NodeType.lifetime_ms:
-			label_nodes[id].node.queue_free()
-			label_nodes.erase(id)
-
-	if label_nodes.size() == 0:
-		visible = false
-
-func clear():
-	for label in label_nodes.values():
-		label.node.queue_free()
-	label_nodes.clear()
-
-func reposition(pos: Vector2, _size):
-	position = pos
-	size = _size
+func clean():
+	if is_instance_valid(current_label_list):
+		current_label_list.clean()

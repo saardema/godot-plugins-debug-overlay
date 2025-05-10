@@ -15,19 +15,13 @@ func clear():
 	mi.mesh = null
 	mmi.multimesh.instance_count = 0
 
-func _get_camera_position():
-	if Engine.is_editor_hint():
-		return EditorInterface.get_editor_viewport_3d(0).get_camera_3d().position
-	return get_viewport().get_camera_3d().position
+func draw_lines(lines: ExpiringEntity.List, camera_position: Vector3):
+	_build_line_multi_mesh(lines, camera_position)
+	#if helper_list.size(): build_line_mesh(helper_list)
+	#helper_list.clean()
+#var helper_list = ExpiringEntity.LineType.List.new()
 
-func draw_line(id: StringName, lines: ExpiringEntity.List):
-	build_line_multi_mesh(lines, _get_camera_position())
-	if helper_list.size(): build_line_mesh(helper_list)
-	helper_list.clean()
-
-var helper_list = ExpiringEntity.LineType.List.new()
-
-func build_line_multi_mesh(lines: ExpiringEntity.List, camera_pos: Vector3):
+func _build_line_multi_mesh(lines: ExpiringEntity.List, camera_pos: Vector3):
 	mmi.multimesh.instance_count = lines.size()
 	var i: int = 0
 	for line: ExpiringEntity.LineType in lines.values():
@@ -45,7 +39,7 @@ func build_line_multi_mesh(lines: ExpiringEntity.List, camera_pos: Vector3):
 		mmi.multimesh.set_instance_color(i, line.color)
 		i += 1
 
-func build_line_mesh(lines: ExpiringEntity.List):
+func _build_line_mesh(lines: ExpiringEntity.List):
 	mi.mesh = ArrayMesh.new()
 	var arrays = []
 	arrays.resize(Mesh.ARRAY_MAX)

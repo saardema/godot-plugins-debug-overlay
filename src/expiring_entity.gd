@@ -13,6 +13,7 @@ func _init(_data: Variant, _expires: bool = true):
 	refresh()
 
 func is_expired():
+	if not expires: return false
 	return Time.get_ticks_msec() - time_updated > lifetime_ms
 
 func refresh():
@@ -20,18 +21,27 @@ func refresh():
 
 class List:
 	var entities: Dictionary[StringName, ExpiringEntity]
+	signal entity_expired(entity: ExpiringEntity)
 
-	func size():
+	func fetch(id: StringName) -> ExpiringEntity:
+		if entities.has(id):
+			return entities[id]
+		return null
+
+	func has(id: StringName) -> bool:
+		return entities.has(id)
+
+	func size() -> int:
 		return entities.size()
 
-	func keys():
+	func keys() -> Array:
 		return entities.keys()
 
-	func values():
+	func values() -> Array:
 		return entities.values()
 
-	func remove(id):
-		entities.erase(id)
+	func remove(id) -> bool:
+		return entities.erase(id)
 
 	func clear():
 		entities.clear()
@@ -39,6 +49,7 @@ class List:
 	func clean():
 		for id in entities.keys():
 			if entities[id].is_expired():
+				entity_expired.emit(entities[id])
 				entities.erase(id)
 
 class NodeType:
@@ -52,12 +63,12 @@ class NodeType:
 	class List:
 		extends ExpiringEntity.List
 
-		func upsert(id: StringName, node, expires):
-			if entities.has(id):
-				entities[id].node = node
-				entities[id].expires = expires
-			else:
-				entities[id] = ExpiringEntity.NodeType.new(node, expires)
+		func update(id: StringName, node: Node, expires: bool):
+			entities[id].node = node
+			entities[id].expires = expires
+
+		func add(id: StringName, node: Node, expires: bool):
+			entities[id] = ExpiringEntity.NodeType.new(node, expires)
 
 class LineType:
 	extends ExpiringEntity
@@ -77,11 +88,16 @@ class LineType:
 		extends ExpiringEntity.List
 
 		func upsert(id: StringName, _p1: Vector3, _p2: Vector3, _color: Color, _thickness: float, expires: bool):
-			if entities.has(id):
-				entities[id].p1 = _p1
-				entities[id].p2 = _p2
-				entities[id].color = _color
-				entities[id].thickness = _thickness
-				entities[id].expires = expires
-			else:
-				entities[id] = ExpiringEntity.LineType.new(_p1, _p2, _color, _thickness, expires)
+			if entities.has(id): update(id, _p1, _p2, _color, _thickness, expires)
+			else: add(id, _p1, _p2, _color, _thickness, expires)
+
+		func update(id: StringName, _p1: Vector3, _p2: Vector3, _color: Color, _thickness: float, expires: bool):
+			entities[id].refresh()
+			entities[id].p1 = _p1
+			entities[id].p2 = _p2
+			entities[id].color = _color
+			entities[id].thickness = _thickness
+			entities[id].expires = expires
+
+		func add(id: StringName, _p1: Vector3, _p2: Vector3, _color: Color, _thickness: float, expires: bool):
+			entities[id] = ExpiringEntity.LineType.new(_p1, _p2, _color, _thickness, expires)
