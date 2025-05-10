@@ -35,7 +35,7 @@ func _process(delta: float) -> void:
 	draw3d.draw_lines(camera.position)
 	ui.clean()
 
-func write(id: StringName, text: Variant, expires: bool = false):
+func write(id: StringName, text: Variant, expires: bool = true):
 	ui.write(id, text, expires)
 
 func draw_line(id: StringName, p1: Vector3, p2: Vector3, color: Color = Color.RED, thickness: float = 0.01, expires: bool = true):

@@ -5,9 +5,6 @@ const LABEL_LIST_SCENE = preload("res://addons/debug-tools/ui/label_list.tscn")
 var scene_list_map: Dictionary[String, Node]
 var current_label_list: _DebugTools_UI_LabelList
 
-func _on_label_expired(entity: ExpiringEntity.NodeType):
-	entity.node.queue_free()
-
 func write(id: String, value: Variant, expires: bool):
 	var text: String = str(value)
 	if not current_label_list: return

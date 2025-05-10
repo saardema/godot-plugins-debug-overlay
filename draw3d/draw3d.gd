@@ -46,15 +46,12 @@ func _build_line_multi_mesh(lines: ExpiringEntity.List, camera_pos: Vector3):
 	for line: ExpiringEntity.LineType in lines.values():
 		var center = (line.p1 + line.p2) / 2.0
 		var diff: Vector3 = line.p2 - line.p1
-		var cam_diff = camera_pos - center
-		var direction = diff.normalized()
-		var plane = Plane(direction)
-		var projection = plane.project(cam_diff)
-		var billboard_angle = Vector3.UP.signed_angle_to(projection, -plane.normal)
-		DebugTools.write("l", billboard_angle)
 		var tf = Transform3D().looking_at(-diff).translated(center)
-		tf = tf.rotated_local(Vector3.FORWARD, billboard_angle)
+		var rel_cam_pos = camera_pos * tf
+		var billboard_angle = atan(rel_cam_pos.x / rel_cam_pos.y)
 		tf = tf.scaled_local(Vector3(line.thickness, line.thickness, diff.length()))
+		tf = tf.rotated_local(Vector3.FORWARD, billboard_angle)
+
 		mmi.multimesh.set_instance_transform(i, tf)
 		mmi.multimesh.set_instance_color(i, line.color)
 		i += 1

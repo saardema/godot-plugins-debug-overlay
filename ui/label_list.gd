@@ -7,8 +7,12 @@ const LABEL = preload("res://addons/debug-tools/ui/label.tscn")
 var list: ExpiringEntity.NodeType.List = ExpiringEntity.NodeType.List.new()
 
 func _ready() -> void:
-	list.entity_expired.connect(func(entity): entity.node.queue_free())
+	list.entity_expired.connect(_on_entity_expired)
 	label_container = $MarginContainer/PanelContainer/MarginContainer/LabelContainer
+
+func _on_entity_expired(entity: ExpiringEntity.NodeType):
+	entity.node.queue_free()
+	visible = list.size() > 1
 
 func write(id: String, text: String, expires: bool):
 	var label: Label
@@ -25,6 +29,8 @@ func write(id: String, text: String, expires: bool):
 		label_container.add_child(label)
 
 	label.text = &"%s: %s" % [id, text]
+
+	visible = list.size() > 0
 
 func clean():
 	list.clean()
