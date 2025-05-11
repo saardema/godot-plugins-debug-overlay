@@ -6,20 +6,16 @@ public partial class DebugTools : Node
 {
     public static Node3D gd_instance;
 
-    public void SetInstance(Node3D instance) => gd_instance = instance;
+    public static DebugTools instance;
 
-    // public static void Ping() => GD.Print("Pong");
+    public DebugTools() => instance = this;
 
-    public override void _Ready()
+    private static bool IsInstanceSet()
     {
-        // TrySetInstance();
-        GD.Print("bridge ready", gd_instance);
-    }
+        gd_instance ??= instance.GetNodeOrNull<Node3D>("../.");
 
-    // public void TrySetInstance()
-    // {
-    //     gd_instance = GetNodeOrNull<Node3D>("/root/DebugTools");
-    // }
+        return gd_instance == null;
+    }
 
     public static void Write(String id, float value, int precision = 2, bool expires = true)
     {
@@ -27,13 +23,24 @@ public partial class DebugTools : Node
         Write(id, formatted, expires);
     }
 
-    public static void Write(String id, String text, bool expires = true)
+    public static void DrawLine(
+        string id,
+        Vector3 p1,
+        Vector3 p2,
+        Color? color = null,
+        float thickness = 0.01f,
+        bool expires = true)
     {
-        if (gd_instance == null)
-        {
-            GD.PrintErr("DebugTools.cs: No instance of DebugTools");
-            return;
-        }
+        if (!IsInstanceSet()) return;
+
+        color ??= Colors.Red;
+
+        gd_instance.Call("draw_line", id, p1, p2, (Color)color, thickness, expires);
+    }
+
+    public static void Write(string id, string text, bool expires = true)
+    {
+        if (!IsInstanceSet()) return;
 
         gd_instance.Call("write", id, text, expires);
     }

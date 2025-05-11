@@ -34,8 +34,12 @@ func on_main_screen_changed(screen: String):
 	instance.on_screen_changed(screen)
 
 func on_scene_changed(scene: Node):
-	print("scene change")
 	if not instance:
 		instance = get_node_or_null("/root/" + AUTOLOAD_NAME_MAIN)
+
+	# if not bridge_instance:
+	# 	bridge_instance = get_node_or_null("/root/DebugTools/CSBridge")
+	# 	if bridge_instance:
+	# 		bridge_instance.call("SetInstance", instance)
 
 	instance.on_scene_changed(scene)

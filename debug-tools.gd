@@ -28,7 +28,6 @@ func _ready():
 	ui = $UI
 	ui.set_current_scene(get_tree().current_scene, ui_node)
 	draw3d.set_current_scene(get_tree().current_scene)
-	find_child("CSBridge").call("SetInstance", self )
 
 func _process(delta: float) -> void:
 	draw3d.draw_lines(camera.position)
