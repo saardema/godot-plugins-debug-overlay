@@ -14,13 +14,32 @@ public partial class DebugTools : Node
     {
         gd_instance ??= instance.GetNodeOrNull<Node3D>("../.");
 
-        return gd_instance == null;
+        return gd_instance != null;
     }
 
-    public static void Write(String id, float value, int precision = 2, bool expires = true)
+    public static void Write(String id, Vector3 vector, int precision = 2, bool expires = true)
     {
-        string formatted = value.ToString("F" + precision);
+        var format = "F" + precision;
+        int pad = precision + 3;
+        if (precision == 0) pad -= 1;
+        string x = vector.X.ToString(format).PadLeft(pad);
+        string y = vector.Y.ToString(format).PadLeft(pad);
+        string z = vector.Z.ToString(format).PadLeft(pad);
+        string formatted = $"{x}, {y}, {z}";
         Write(id, formatted, expires);
+    }
+
+    public static void Write(String id, float floatValue, int precision = 2, bool expires = true)
+    {
+        string formatted = floatValue.ToString("F" + precision);
+        Write(id, formatted, expires);
+    }
+
+    public static void Write(string id, string text, bool expires = true)
+    {
+        if (!IsInstanceSet()) return;
+
+        gd_instance.Call("write", id, text, expires);
     }
 
     public static void DrawLine(
@@ -36,12 +55,5 @@ public partial class DebugTools : Node
         color ??= Colors.Red;
 
         gd_instance.Call("draw_line", id, p1, p2, (Color)color, thickness, expires);
-    }
-
-    public static void Write(string id, string text, bool expires = true)
-    {
-        if (!IsInstanceSet()) return;
-
-        gd_instance.Call("write", id, text, expires);
     }
 }
