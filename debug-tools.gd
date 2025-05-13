@@ -10,12 +10,12 @@ var camera: Camera3D
 var ui_node: Node
 
 func _on_plugin_exit() -> void:
-	print("DebugTools exit_tree")
+	# print("DebugTools exit_tree")
 	ui.clear_map()
 	ui_node.queue_free()
 
 func _enter_tree() -> void:
-	print("DebugTools enter_tree")
+	# print("DebugTools enter_tree")
 	ui_node = UI_SCENE.instantiate()
 	if Engine.is_editor_hint():
 		EditorInterface.get_editor_viewport_3d().add_child(ui_node)
@@ -41,21 +41,21 @@ func draw_line(id: StringName, p1: Vector3, p2: Vector3, color: Color = Color.RE
 	draw3d.set_line(id, p1, p2, color, thickness, expires)
 
 func disable():
-	print("DebugTools disabled")
+	# print("DebugTools disabled")
 	is_enabled = false
 	draw3d.visible = false
 
 func enable():
-	print("DebugTools enabled")
+	# print("DebugTools enabled")
 	is_enabled = true
 	draw3d.visible = true
 
 func _get_camera():
 	if Engine.is_editor_hint():
 		return EditorInterface.get_editor_viewport_3d(0).get_camera_3d()
-	if get_viewport():
+	if get_viewport().get_camera_3d():
 		return get_viewport().get_camera_3d()
-	return null
+	return Camera3D.new()
 
 func on_scene_changed(scene: Node):
 	ui.set_current_scene(scene, ui_node)

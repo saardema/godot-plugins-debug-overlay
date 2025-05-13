@@ -13,7 +13,6 @@ var bridge_instance: Node
 
 func _enable_plugin():
 	print("Plugin enabled")
-
 	add_autoload_singleton(AUTOLOAD_NAME_MAIN, AUTOLOAD_PATH_MAIN)
 
 func _enter_tree() -> void:
@@ -22,24 +21,15 @@ func _enter_tree() -> void:
 
 func _disable_plugin():
 	print("Plugin disabled")
-
-	#if instance:
 	instance._on_plugin_exit()
 
 	remove_autoload_singleton(AUTOLOAD_NAME_MAIN)
-	# remove_autoload_singleton(AUTOLOAD_NAME_BRIDGE)
 
 func on_main_screen_changed(screen: String):
-	#if instance:
 	instance.on_screen_changed(screen)
 
 func on_scene_changed(scene: Node):
 	if not instance:
 		instance = get_node_or_null("/root/" + AUTOLOAD_NAME_MAIN)
-
-	# if not bridge_instance:
-	# 	bridge_instance = get_node_or_null("/root/DebugTools/CSBridge")
-	# 	if bridge_instance:
-	# 		bridge_instance.call("SetInstance", instance)
 
 	instance.on_scene_changed(scene)
