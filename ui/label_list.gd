@@ -31,9 +31,8 @@ func write(id: String, text: String, expires: bool):
 
 	visible = list.size() > 0
 
-func clean():
-	list.clean()
+func count(): return label_container.get_child_count()
 
-func clear():
-	for child in label_container.get_children():
-		child.queue_free()
+func clean(): list.clean()
+
+func clear(): for child in label_container.get_children(): child.queue_free()

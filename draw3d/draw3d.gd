@@ -1,4 +1,5 @@
 @tool
+class_name _DebugToolsDraw3D
 extends Node3D
 
 @onready var mi: MeshInstance3D = $LineMesh
@@ -28,7 +29,6 @@ func clean():
 	current_lines.clean()
 
 func set_current_scene(scene):
-
 	if not scene or scene.scene_file_path.contains('addons/debug-tools'):
 		current_lines = ExpiringEntity.LineType.List.new()
 		return

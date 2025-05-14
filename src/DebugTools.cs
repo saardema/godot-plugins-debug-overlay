@@ -4,17 +4,11 @@ using System;
 [Tool]
 public partial class DebugTools : Node
 {
-    public static Node3D gd_instance;
+    private static Node3D gd_instance;
 
-    public static DebugTools instance;
-
-    public DebugTools() => instance = this;
-
-    private static bool IsInstanceSet()
+    public override void _EnterTree()
     {
-        gd_instance ??= instance.GetNodeOrNull<Node3D>("../.");
-
-        return gd_instance != null;
+        gd_instance = GetNode<Node3D>("../.");
     }
 
     public static void Write(String id, Vector3 vector, int precision = 2, bool expires = true)
@@ -37,7 +31,7 @@ public partial class DebugTools : Node
 
     public static void Write(string id, string text, bool expires = true)
     {
-        if (!IsInstanceSet()) return;
+        // if (!IsInstanceSet()) return;
 
         gd_instance.Call("write", id, text, expires);
     }
@@ -50,7 +44,7 @@ public partial class DebugTools : Node
         float thickness = 0.01f,
         bool expires = true)
     {
-        if (!IsInstanceSet()) return;
+        // if (!IsInstanceSet()) return;
 
         color ??= Colors.Red;
 

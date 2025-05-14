@@ -48,7 +48,6 @@ class List:
 
 	func clean():
 		for id in entities.keys():
-			#print(entities[id].expires)
 			if entities[id].is_expired():
 				entity_expired.emit(entities[id])
 				entities.erase(id)

@@ -10,7 +10,9 @@ script = ExtResource("1_gqrq7")
 
 [node name="Draw3D" parent="." instance=ExtResource("2_ntg42")]
 
-[node name="UI" type="Node" parent="."]
+[node name="UI" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 0
 script = ExtResource("3_gqrq7")
 
 [node name="CSBridge" type="Node" parent="."]
