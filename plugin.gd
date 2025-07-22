@@ -25,6 +25,14 @@ func _enable_plugin():
 	_apply_settings()
 
 
+func _disable_plugin():
+	#print("Plugin disabled")
+	if instance: instance._on_plugin_disable()
+
+	remove_autoload_singleton(PLUGIN_NAME)
+	#_remove_editor_settings()
+
+
 func _add_editor_settings():
 	var settings = EditorInterface.get_editor_settings()
 
@@ -52,8 +60,7 @@ func _apply_settings():
 		var setting_path = PLUGIN_NAME + '/' + key
 		if key.begins_with('write/visibility/') and settings.get_setting(setting_path):
 			config['visible_on_screens'].append(SETTINGS_MAP[key][4])
-		else:
-			config[key] = settings.get_setting(setting_path)
+		config[key] = settings.get_setting(setting_path)
 
 	# Apply visibility of UI
 	if current_screen: _on_main_screen_changed(current_screen)
@@ -86,13 +93,7 @@ func _enter_tree() -> void:
 	main_screen_changed.connect(_on_main_screen_changed)
 	scene_changed.connect(_on_scene_changed)
 
-
-func _disable_plugin():
-	#print("Plugin disabled")
-	if instance: instance._on_plugin_disable()
-
-	remove_autoload_singleton(PLUGIN_NAME)
-	_remove_editor_settings()
+	_apply_settings()
 
 
 func _on_main_screen_changed(screen: String):

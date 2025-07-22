@@ -5,7 +5,7 @@ extends RefCounted
 var time_updated: int
 var expires: bool
 var data: Variant
-static var lifetime_ms: float = 1000
+static var lifetime_ms: float = 2000
 
 func _init(_data: Variant, _expires: bool = true):
 	data = _data
@@ -49,8 +49,9 @@ class List:
 	func clean():
 		for id in entities.keys():
 			if entities[id].is_expired():
-				entity_expired.emit(entities[id])
+				var entity = entities[id]
 				entities.erase(id)
+				entity_expired.emit(entity)
 
 class NodeType:
 	extends ExpiringEntity

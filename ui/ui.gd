@@ -1,21 +1,25 @@
 @tool
 class_name _DebugTools_UI
 extends Control
-const LABEL_LIST_SCENE = preload("res://addons/debug-tools/ui/label_list.tscn")
+
+const LABEL_LIST_SCENE = preload("label_list.tscn")
+
 var scene_list_map: Dictionary[String, Node]
 var current_label_list: _DebugTools_UI_LabelList
-const float_format: String = &".%df"
+const float_format: StringName = &"%*.*f"
+const vector_format: StringName = &"%*.*v"
 
-func write(id: String, value: Variant, expires: bool, precision: int):
-	if not current_label_list: return
+func _format(value: Variant, precision: int) -> String:
+	if value is Array or value is PackedFloat32Array:
+		return '[%s ]' % ', '.join((value as Array).map(_format.bind(precision)))
 
-	var text: String
 	if value is float:
-		text =  &"%%.%df" % precision % value
-	else:
-		text = str(value)
+		return float_format % [precision + 3, precision, value]
 
-	current_label_list.write(id, text, expires)
+	if value is Vector2 or value is Vector3 or value is Vector4:
+		return vector_format % [precision + 3, precision, value]
+
+	return str(value)
 
 func set_current_scene(scene: Node, ui_node: Control):
 	if not scene or scene.scene_file_path.contains('addons/debug-tools'):
@@ -41,6 +45,3 @@ func clear_current_list():
 func clean():
 	if is_instance_valid(current_label_list):
 		current_label_list.clean()
-
-func set_font_size(font_size: int):
-	pass

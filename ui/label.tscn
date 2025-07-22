@@ -6,7 +6,7 @@ subpixel_positioning = 0
 
 [sub_resource type="LabelSettings" id="LabelSettings_ux1pj"]
 font = SubResource("SystemFont_q16s1")
-font_size = 28
+font_size = 32
 
 [node name="Label" type="Label"]
 text = "Test content"

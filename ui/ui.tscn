@@ -2,11 +2,7 @@
 
 [node name="UI" type="Control"]
 layout_mode = 3
-anchor_left = 0.004
-anchor_right = 1.0
-anchor_bottom = 0.994
-offset_left = -11.52
-offset_bottom = 9.71997
-grow_horizontal = 2
-grow_vertical = 2
-mouse_filter = 2
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+grow_vertical = 0
