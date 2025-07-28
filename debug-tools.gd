@@ -44,6 +44,8 @@ func _process(delta: float) -> void:
 
 
 func print(value: Variant, precision: int = 2):
+	if not ui: return
+
 	if ui.current_label_list:
 		var caller: Dictionary = get_stack()[1]
 		var id: StringName = str(hash(caller['source']) + caller['line'])
